@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Boyfriend's Day Baa! ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#0b0f19',
+                        deepBlue: '#111827',
+                        neonPurple: '#a855f7',
+                        pinkGlow: '#ec4899',
+                        goldAccent: '#fbbf24'
+                    },
+                    fontFamily: {
+                        romantic: ['"Dancing Script"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        pixel: ['"Press Start 2P"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Keyframe Animations & FX */
+        body {
+            background: radial-gradient(circle at center, #1e1b4b 0%, #0b0f19 100%);
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.35);
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+        }
+
+        /* Canvas Particle Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 3D Envelope Animation */
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+
+        .envelope {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+        }
+
+        .envelope-flap {
+            transform-origin: top;
+            transition: transform 0.5s ease 0.2s, z-index 0.2s;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .letter {
+            transition: transform 0.6s ease 0.4s, opacity 0.5s ease;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-120px) scale(1.02);
+            z-index: 20;
+        }
+
+        /* Flip Card Logic */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Polaroid Effect */
+        .polaroid {
+            background: #ffffff;
+            color: #111827;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: translateY(-8px) rotate(1deg) scale(1.02);
+            box-shadow: 0 20px 40px rgba(236, 72, 153, 0.4);
+        }
+
+        /* Modal Overlay */
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen relative selection:bg-pinkGlow selection:text-white">
+
+    <canvas id="starfield"></canvas>
+
+    <!-- Floating Audio Control Container -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md border border-pink-500/30 p-2 rounded-full shadow-lg">
+        <button id="bgmToggle" class="w-10 h-10 rounded-full bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center transition-transform active:scale-95 shadow-md">
+            <i id="bgmIcon" class="fas font-solid fa-music text-sm"></i>
+        </button>
+        <span id="bgmStatus" class="text-xs font-semibold px-2 pr-3 text-pink-300 hidden sm:inline">Playing Love Anthem</span>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-16">
+
+        <!-- HERO SECTION -->
+        <header class="text-center space-y-4 pt-6">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-xs sm:text-sm font-semibold tracking-wide uppercase animate-pulse">
+                <i class="fas fa-heart text-pink-500"></i> Exclusively For Baa <i class="fas fa-heart text-pink-500"></i>
+            </div>
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-400 font-romantic py-2">
+                Happy Boyfriend's Day, Baa! ❤️
+            </h1>
+            <p class="text-slate-300 text-base sm:text-lg max-w-xl mx-auto font-light leading-relaxed">
+                Tap the envelope below to open your surprise love letter!
+            </p>
+        </header>
+
+        <!-- INTERACTIVE ENVELOPE SECTION -->
+        <section class="flex flex-col items-center justify-center py-6">
+            <div id="envelopeContainer" class="w-full max-w-md cursor-pointer group">
+                <div id="envelope" class="relative bg-pink-900/40 border-2 border-pink-500/40 rounded-2xl p-6 shadow-2xl backdrop-blur-md transition-all duration-300 hover:border-pink-400 hover:shadow-pink-500/20 text-center">
+                    
+                    <div id="envelopeClosedState" class="py-12 space-y-4 flex flex-col items-center">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-envelope-open-text text-3xl text-white"></i>
+                        </div>
+                        <p class="text-pink-200 font-semibold text-lg">Click to Open Letter 💌</p>
+                        <span class="text-xs text-pink-400/80">From Khushi, With Love</span>
+                    </div>
+
+                    <!-- Opened Letter Content (Hidden by default) -->
+                    <div id="letterContent" class="hidden text-left bg-slate-900/90 border border-pink-500/30 p-6 sm:p-8 rounded-xl shadow-2xl space-y-4 text-slate-200 leading-relaxed font-sans text-sm sm:text-base border-t-4 border-t-pink-500">
+                        <div class="flex justify-between items-center border-b border-slate-700/60 pb-3">
+                            <span class="font-romantic text-2xl text-pink-400 font-bold">Dear Meri Jaan,</span>
+                            <i class="fas fa-heart text-pink-500 text-lg"></i>
+                        </div>
+                        
+                        <p class="text-slate-300">
+                            Today is officially Boyfriend’s Day, but honestly, you are the person I celebrate in my heart every single morning. I don't tell you nearly enough how much your presence changes my life. Ordinary days become my favorite days just because you are in them, and even the quietest moments with you feel like home.
+                        </p>
+                        <p class="text-slate-300">
+                            Thank you for the way you listen to me, for making me laugh when I least expect it, and for being my safest place in a loud world. I notice the little things you do, and I appreciate the steady, gentle way you love. I hit the absolute jackpot having you by my side, and if I had to choose a million times over, I would still choose you.
+                        </p>
+                        <p class="text-slate-300">
+                            Happy Boyfriend’s Day to my favorite person. I love you more than words can say.
+                        </p>
+
+                        <div class="pt-4 border-t border-slate-700/60 text-right">
+                            <p class="text-xs text-pink-400 uppercase tracking-widest font-semibold">With all my love,</p>
+                            <p class="font-romantic text-3xl text-pink-400 font-bold mt-1">Khushi ❤️</p>
+                        </div>
+
+                        <button id="closeLetterBtn" class="w-full mt-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition-colors border border-slate-700">
+                            Close Letter
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE DURATION COUNTER -->
+        <section class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-xl text-center space-y-6">
+            <div class="space-y-1">
+                <span class="text-xs font-bold tracking-widest text-pink-400 uppercase">Since March 11, 2022</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Our Love Story In Real Time ⏳</h2>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                <div class="bg-slate-800/80 border border-pink-500/20 rounded-2xl p-4 shadow-inner">
+                    <span id="counterDays" class="text-3xl sm:text-4xl font-extrabold text-pink-400 block">0</span>
+                    <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Days</span>
+                </div>
+                <div class="bg-slate-800/80 border border-purple-500/20 rounded-2xl p-4 shadow-inner">
+                    <span id="counterHours" class="text-3xl sm:text-4xl font-extrabold text-purple-400 block">0</span>
+                    <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Hours</span>
+                </div>
+                <div class="bg-slate-800/80 border border-indigo-500/20 rounded-2xl p-4 shadow-inner">
+                    <span id="counterMinutes" class="text-3xl sm:text-4xl font-extrabold text-indigo-400 block">0</span>
+                    <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Minutes</span>
+                </div>
+                <div class="bg-slate-800/80 border border-pink-500/20 rounded-2xl p-4 shadow-inner">
+                    <span id="counterSeconds" class="text-3xl sm:text-4xl font-extrabold text-pink-500 block">0</span>
+                    <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Seconds</span>
+                </div>
+            </div>
+            <p class="text-xs text-slate-400 italic">...and every single second gets better with you, Baa! ✨</p>
+        </section>
+
+        <!-- BOYFRIEND COUPONS SECTION -->
+        <section class="space-y-8">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold">
+                    <i class="fas fa-gamepad"></i> Gaming & Movie VIP Pass
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Special Boyfriend Coupons 🎟️</h2>
+                <p class="text-slate-400 text-sm max-w-md mx-auto">
+                    Redeemable anytime with Khushi! Click "Redeem" to claim your perk.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Coupon 1 -->
+                <div class="bg-gradient-to-br from-slate-900 to-purple-950/40 border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg hover:border-purple-500/60 transition-all">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-purple-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between items-start">
+                            <span class="text-2xl">🎮</span>
+                            <span class="text-xs font-mono px-2 py-1 bg-purple-500/20 text-purple-300 rounded border border-purple-500/30">PASS #001</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Uninterrupted Gaming Marathon</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Zero chores, endless snacks & zero complaints while you game with your boys or solo!
+                        </p>
+                        <div class="text-xs text-purple-400 font-semibold pt-1">
+                            <i class="fas fa-clock mr-1"></i> Valid 24/7 forever & ever
+                        </div>
+                    </div>
+                    <div class="pt-6 relative z-10">
+                        <button onclick="redeemCoupon('Uninterrupted Gaming Marathon 🎮')" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-ticket-alt"></i> Redeem Coupon
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coupon 2 -->
+                <div class="bg-gradient-to-br from-slate-900 to-pink-950/40 border border-pink-500/30 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg hover:border-pink-500/60 transition-all">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-pink-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between items-start">
+                            <span class="text-2xl">🎬🍿</span>
+                            <span class="text-xs font-mono px-2 py-1 bg-pink-500/20 text-pink-300 rounded border border-pink-500/30">PASS #002</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Movie Night Command & VIP Snacks</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            You pick the movie/series, I make the popcorn, soft drinks, and won't fall asleep in the middle!
+                        </p>
+                        <div class="text-xs text-pink-400 font-semibold pt-1">
+                            <i class="fas fa-star mr-1"></i> Includes favorite snacks & playlist
+                        </div>
+                    </div>
+                    <div class="pt-6 relative z-10">
+                        <button onclick="redeemCoupon('Movie Night Command & VIP Snacks 🎬🍿')" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-semibold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-ticket-alt"></i> Redeem Coupon
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coupon 3 -->
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-indigo-500/30 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500/60 transition-all">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between items-start">
+                            <span class="text-2xl">🕹️</span>
+                            <span class="text-xs font-mono px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">PASS #003</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Co-Op Player 2 Joined The Game</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            I play your favorite multiplayer/co-op game with you, even if I keep falling off the map!
+                        </p>
+                        <div class="text-xs text-indigo-400 font-semibold pt-1">
+                            <i class="fas fa-gamepad mr-1"></i> Guaranteed fun & laughs
+                        </div>
+                    </div>
+                    <div class="pt-6 relative z-10">
+                        <button onclick="redeemCoupon('Co-Op Player 2 Joined The Game 🕹️️')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-ticket-alt"></i> Redeem Coupon
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coupon 4 -->
+                <div class="bg-gradient-to-br from-slate-900 to-amber-950/40 border border-amber-500/30 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg hover:border-amber-500/60 transition-all">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="space-y-3 relative z-10">
+                        <div class="flex justify-between items-start">
+                            <span class="text-2xl">🍕🏆</span>
+                            <span class="text-xs font-mono px-2 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">PASS #004</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Gaming Cave & Movie Marathon Pass</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Unlimited pizza order, cozy blanket fort setup, dark room & total relaxation guaranteed!
+                        </p>
+                        <div class="text-xs text-amber-400 font-semibold pt-1">
+                            <i class="fas fa-crown mr-1"></i> Ultimate VIP Treatment
+                        </div>
+                    </div>
+                    <div class="pt-6 relative z-10">
+                        <button onclick="redeemCoupon('Gaming Cave & Movie Marathon Pass 🍕🏆')" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-ticket-alt"></i> Redeem Coupon
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PHOTO GALLERY SECTION -->
+        <section class="space-y-8">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-xs font-semibold">
+                    <i class="fas fa-camera-retro"></i> Our Memory Vault
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Favorite Moments Together 📸</h2>
+                <p class="text-slate-400 text-sm max-w-md mx-auto">
+                    Click any polaroid to expand and view our full memory!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Photo 1 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830115888_2263027867869633_6640007381160511134_n.jpg?stp=dst-jpg_tt6&cstp=mx652x1337&ctp=s652x1337&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=46xHNNvdCIEQ7kNvwHFiT0A&_nc_oc=AdrUqsTC6qeXcJ5FdfXHqzMyI0ztPr0eMH7uP1FyVQAqZpE06t4KEXP6hlNyPQomgnA&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEMsVqI0ZYjqEYNNMhWv0zq3Bp3C66HtRuFJxvQJsSwJw&oe=6AE799D4', 'First Photo')" class="polaroid p-3 rounded-xl cursor-pointer transform -rotate-1">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830115888_2263027867869633_6640007381160511134_n.jpg?stp=dst-jpg_tt6&cstp=mx652x1337&ctp=s652x1337&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=46xHNNvdCIEQ7kNvwHFiT0A&_nc_oc=AdrUqsTC6qeXcJ5FdfXHqzMyI0ztPr0eMH7uP1FyVQAqZpE06t4KEXP6hlNyPQomgnA&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEMsVqI0ZYjqEYNNMhWv0zq3Bp3C66HtRuFJxvQJsSwJw&oe=6AE799D4" alt="First Photo" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">First Photo</p>
+                </div>
+
+                <!-- Photo 2 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830452399_2160888554821677_7454163801040911085_n.jpg?stp=dst-jpg_tt6&cstp=mx774x528&ctp=s774x528&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=W-oXHyAWxkAQ7kNvwEG7gSA&_nc_oc=AdpodhdEdCYvViR0CmXDx3NpnhrziFw9mCb5yCHgslbcS24gGfHJO4cYUkG8G14ydVA&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gH6MrOZEi87l5OJ1AYNHaV_OJ7dSEjKImcKLCprGA-IbQ&oe=6AE7A1F1', 'High School Era')" class="polaroid p-3 rounded-xl cursor-pointer transform rotate-2">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830452399_2160888554821677_7454163801040911085_n.jpg?stp=dst-jpg_tt6&cstp=mx774x528&ctp=s774x528&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=W-oXHyAWxkAQ7kNvwEG7gSA&_nc_oc=AdpodhdEdCYvViR0CmXDx3NpnhrziFw9mCb5yCHgslbcS24gGfHJO4cYUkG8G14ydVA&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gH6MrOZEi87l5OJ1AYNHaV_OJ7dSEjKImcKLCprGA-IbQ&oe=6AE7A1F1" alt="High School Era" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">High School Era</p>
+                </div>
+
+                <!-- Photo 3 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830753137_1538369294976774_573701165313711634_n.jpg?stp=dst-jpg_tt6&cstp=mx1200x1600&ctp=s1200x1600&_nc_cat=110&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=2F2bUcWm70cQ7kNvwEHd7Ee&_nc_oc=Adrq0TcPySbpVi9GTmvBhp7joSdTmOcR8tdTcW2oNE93bf4udDk0OY4-UFWlfu903no&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEdONMN-FaF9eyZ40ttEjQ6Iq9xAoSlVlsdX0dQPqKAGg&oe=6AE7AFB5', 'High School Nightouts')" class="polaroid p-3 rounded-xl cursor-pointer transform -rotate-2">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830753137_1538369294976774_573701165313711634_n.jpg?stp=dst-jpg_tt6&cstp=mx1200x1600&ctp=s1200x1600&_nc_cat=110&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=2F2bUcWm70cQ7kNvwEHd7Ee&_nc_oc=Adrq0TcPySbpVi9GTmvBhp7joSdTmOcR8tdTcW2oNE93bf4udDk0OY4-UFWlfu903no&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEdONMN-FaF9eyZ40ttEjQ6Iq9xAoSlVlsdX0dQPqKAGg&oe=6AE7AFB5" alt="High School Nightouts" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">High School Nightouts</p>
+                </div>
+
+                <!-- Photo 4 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/831491471_1628894102166760_6831525232998772129_n.jpg?stp=dst-jpg_tt6&cstp=mx528x944&ctp=s528x944&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=bUecAtLM9tUQ7kNvwH0w55Y&_nc_oc=Ado0LFSrb-MFZG7y0Geqn5DgZMGE9aBWRwFFstn2qtYOdtc9IeavHCNnV8M8kaSURR0&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gHjN6fgFstB63HceX3Lj4BB00mX55-NX3olM3he9GFxYw&oe=6AE79501', 'Melody')" class="polaroid p-3 rounded-xl cursor-pointer transform rotate-1">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/831491471_1628894102166760_6831525232998772129_n.jpg?stp=dst-jpg_tt6&cstp=mx528x944&ctp=s528x944&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=bUecAtLM9tUQ7kNvwH0w55Y&_nc_oc=Ado0LFSrb-MFZG7y0Geqn5DgZMGE9aBWRwFFstn2qtYOdtc9IeavHCNnV8M8kaSURR0&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gHjN6fgFstB63HceX3Lj4BB00mX55-NX3olM3he9GFxYw&oe=6AE79501" alt="Melody" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">Melody</p>
+                </div>
+
+                <!-- Photo 5 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830389480_2922615211435541_8434384660321794389_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x845&ctp=s1125x845&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=jw0VpOVX8z8Q7kNvwFEOaKB&_nc_oc=Adp-PyLIxgDdVHev70WZHQ_0ZwBWh_8D_8FgQKmrO0p0SpLEbWOYF4BjoLzRG83FKfk&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEQTP7fNUKvMjBbIVtesWTPsGQF2SVUi1WV7nFveX_zEg&oe=6AE7A410', 'Forever Favorite')" class="polaroid p-3 rounded-xl cursor-pointer transform rotate-2">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/830389480_2922615211435541_8434384660321794389_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x845&ctp=s1125x845&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=jw0VpOVX8z8Q7kNvwFEOaKB&_nc_oc=Adp-PyLIxgDdVHev70WZHQ_0ZwBWh_8D_8FgQKmrO0p0SpLEbWOYF4BjoLzRG83FKfk&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEQTP7fNUKvMjBbIVtesWTPsGQF2SVUi1WV7nFveX_zEg&oe=6AE7A410" alt="Forever Favorite" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">Forever Favorite</p>
+                </div>
+
+                <!-- Photo 6 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/833409026_1098454509565570_3224509113155306869_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1497&ctp=s1125x1497&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=w1VBI7v0clQQ7kNvwHmKLEG&_nc_oc=AdoCDXSMamirLRYD91VEFpLOCTt3WjSdD5OKnqg5_WRUNy4-IG26eRW7Ed3-y9I16Co&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gFtF2qlWvwQiSvv01RVDxVwRFor5W-outQHC_59ZZPHpQ&oe=6AE77EF4', 'Silly Face Challenge')" class="polaroid p-3 rounded-xl cursor-pointer transform -rotate-1">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/833409026_1098454509565570_3224509113155306869_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1497&ctp=s1125x1497&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=w1VBI7v0clQQ7kNvwHmKLEG&_nc_oc=AdoCDXSMamirLRYD91VEFpLOCTt3WjSdD5OKnqg5_WRUNy4-IG26eRW7Ed3-y9I16Co&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gFtF2qlWvwQiSvv01RVDxVwRFor5W-outQHC_59ZZPHpQ&oe=6AE77EF4" alt="Silly Face Challenge" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">Silly Face Challenge</p>
+                </div>
+
+                <!-- Photo 7 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/831422651_1825790301768878_3071605653339513443_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1500&ctp=s1125x1500&_nc_cat=107&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=zYVnCAaAJigQ7kNvwHEpFVL&_nc_oc=AdpGlSKCFPZGwLatvTfWs6UaMzDp9V2Ic3mijnGX0AL_WOL5TFCujxsJgHINeuUi1Kw&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gF6TRs9W5J5A3Wz-eg11PHNHUN0NTw2wMAM3CXaFMzqHQ&oe=6AE7A2B1', 'Adult Dates')" class="polaroid p-3 rounded-xl cursor-pointer transform rotate-3">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/831422651_1825790301768878_3071605653339513443_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1500&ctp=s1125x1500&_nc_cat=107&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=zYVnCAaAJigQ7kNvwHEpFVL&_nc_oc=AdpGlSKCFPZGwLatvTfWs6UaMzDp9V2Ic3mijnGX0AL_WOL5TFCujxsJgHINeuUi1Kw&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gF6TRs9W5J5A3Wz-eg11PHNHUN0NTw2wMAM3CXaFMzqHQ&oe=6AE7A2B1" alt="Adult Dates" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">Adult Dates</p>
+                </div>
+
+                <!-- Photo 8 -->
+                <div onclick="openLightbox('https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/833894203_2073258403558798_497718284107238034_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1497&ctp=s1125x1497&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=IqqEVNPHzlAQ7kNvwHz1_Dy&_nc_oc=AdqE8tIpSvm1Fq_CdUJozmsZovTM_u-iduv4m-cfAKkvF3tte45LAuz6s-REdOBU_2w&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEHZX2T_be6FegNOvo-BZM4le1Z6VCi2qdaETL7jH8OQg&oe=6AE7984E', 'Best Friends Forever')" class="polaroid p-3 rounded-xl cursor-pointer transform -rotate-2">
+                    <div class="aspect-[4/5] bg-slate-200 rounded-lg overflow-hidden relative">
+                        <img src="https://scontent.fsuv2-1.fna.fbcdn.net/v/t1.15752-9/833894203_2073258403558798_497718284107238034_n.jpg?stp=dst-jpg_tt6&cstp=mx1125x1497&ctp=s1125x1497&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=IqqEVNPHzlAQ7kNvwHz1_Dy&_nc_oc=AdqE8tIpSvm1Fq_CdUJozmsZovTM_u-iduv4m-cfAKkvF3tte45LAuz6s-REdOBU_2w&_nc_zt=23&_nc_ht=scontent.fsuv2-1.fna&_nc_ss=7b2a8&oh=03_Q7cD6gEHZX2T_be6FegNOvo-BZM4le1Z6VCi2qdaETL7jH8OQg&oe=6AE7984E" alt="Best Friends Forever" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-romantic text-center text-slate-800 text-xl pt-3 font-bold">Best Friends Forever</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FLIP CARDS SECTION -->
+        <section class="space-y-8">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 text-xs font-semibold">
+                    <i class="fas fa-trophy"></i> Player 1 Perks
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-white">Why You're My Ultimate MVP 🎮🍿</h2>
+                <p class="text-slate-400 text-sm max-w-md mx-auto">
+                    Hover or tap each card to reveal hidden perks!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="flip-card h-48 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full rounded-2xl shadow-xl">
+                        <div class="flip-card-front absolute w-full h-full bg-slate-900 border border-pink-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <i class="fas fa-headset text-4xl text-pink-400 mb-3"></i>
+                            <h3 class="font-bold text-lg text-white">Pro Gaming Focus</h3>
+                            <span class="text-xs text-pink-400/80 mt-1">Tap to flip 💫</span>
+                        </div>
+                        <div class="flip-card-back absolute w-full h-full bg-gradient-to-br from-pink-600 to-purple-800 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <p class="text-sm font-medium text-white">
+                                Seeing you locked into your games with that focus is the cutest thing ever!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flip-card h-48 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full rounded-2xl shadow-xl">
+                        <div class="flip-card-front absolute w-full h-full bg-slate-900 border border-purple-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <i class="fas fa-film text-4xl text-purple-400 mb-3"></i>
+                            <h3 class="font-bold text-lg text-white">Movie Marathon Partner</h3>
+                            <span class="text-xs text-purple-400/80 mt-1">Tap to flip 💫</span>
+                        </div>
+                        <div class="flip-card-back absolute w-full h-full bg-gradient-to-br from-purple-600 to-indigo-800 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <p class="text-sm font-medium text-white">
+                                You make every plot twist, jump scare, and cinema night 10x more thrilling!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flip-card h-48 cursor-pointer">
+                    <div class="flip-card-inner relative w-full h-full rounded-2xl shadow-xl">
+                        <div class="flip-card-front absolute w-full h-full bg-slate-900 border border-indigo-500/30 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <i class="fas fa-shield-cat text-4xl text-indigo-400 mb-3"></i>
+                            <h3 class="font-bold text-lg text-white">My Safe Haven</h3>
+                            <span class="text-xs text-indigo-400/80 mt-1">Tap to flip 💫</span>
+                        </div>
+                        <div class="flip-card-back absolute w-full h-full bg-gradient-to-br from-indigo-600 to-pink-800 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                            <p class="text-sm font-medium text-white">
+                                Your gentle hugs & steady presence make every single ordinary day extraordinary.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE QUESTION WIDGET -->
+        <section id="questionSection" class="bg-gradient-to-r from-pink-900/40 via-purple-900/40 to-indigo-900/40 border border-pink-500/30 rounded-3xl p-8 backdrop-blur-md text-center space-y-6 shadow-2xl">
+            <h2 class="text-2xl sm:text-3xl font-bold text-white">Quick Question For You, Baa... 💖</h2>
+            <p class="text-slate-300 text-base max-w-md mx-auto">
+                Are you ready for our next late-night gaming & movie date tonight?
+            </p>
+
+            <div class="flex items-center justify-center gap-6 relative min-h-[60px] pt-2">
+                <button id="yesBtn" class="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-2xl shadow-lg transform active:scale-95 transition-all text-base">
+                    YES! Absolutely 🎬🎮
+                </button>
+                <button id="noBtn" class="px-8 py-3 bg-slate-800 text-slate-300 font-semibold rounded-2xl border border-slate-700 absolute transition-all duration-200">
+                    No 😜
+                </button>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-6 text-xs text-slate-500 space-y-1">
+            <p>Made with endless love by <span class="text-pink-400 font-semibold">Khushi</span> for <span class="text-purple-400 font-semibold">Baa</span> ❤️</p>
+            <p>Happy Boyfriend's Day 2026 & Forever!</p>
+        </footer>
+
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="lightbox" class="modal fixed inset-0 z-50 bg-black/90 opacity-0 pointer-events-none flex items-center justify-center p-4">
+        <div class="relative max-w-3xl w-full bg-slate-900 border border-pink-500/40 rounded-2xl p-4 shadow-2xl space-y-4">
+            <button onclick="closeLightbox()" class="absolute -top-4 -right-4 w-10 h-10 bg-pink-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg hover:bg-pink-500">
+                ✕
+            </button>
+            <div class="max-h-[75vh] overflow-hidden rounded-xl bg-black flex items-center justify-center">
+                <img id="lightboxImg" src="" alt="Expanded View" class="max-h-[75vh] w-auto object-contain">
+            </div>
+            <p id="lightboxCaption" class="text-center text-pink-300 font-romantic text-2xl font-bold"></p>
+        </div>
+    </div>
+
+    <!-- AUDIO SOUND EFFECTS (Web Audio API Synthesizer) -->
+    <script>
+        // Web Audio API Sound FX generator (No external audio asset dependence)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playPop() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+            playFanfare() {
+                this.init();
+                if (!this.ctx) return;
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.1);
+                    osc.stop(this.ctx.currentTime + idx * 0.1 + 0.3);
+                });
+            }
+        }
+        const sfx = new SoundFX();
+
+        // Canvas Particle Background
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const particles = [];
+        const particleCount = 45;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 12 + 6,
+                speedY: Math.random() * 0.6 + 0.2,
+                opacity: Math.random() * 0.6 + 0.2,
+                type: Math.random() > 0.4 ? 'heart' : 'star'
+            });
+        }
+
+        function drawHeart(x, y, size, color) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y + size / 4);
+            ctx.quadraticCurveTo(x, y, x + size / 4, y);
+            ctx.quadraticCurveTo(x + size / 2, y, x + size / 2, y + size / 4);
+            ctx.quadraticCurveTo(x + size / 2, y, x + (size * 3) / 4, y);
+            ctx.quadraticCurveTo(x + size, y, x + size, y + size / 4);
+            ctx.quadraticCurveTo(x + size, y + size / 2, x + (size * 3) / 4, y + (size * 3) / 4);
+            ctx.lineTo(x + size / 2, y + size);
+            ctx.lineTo(x + size / 4, y + (size * 3) / 4);
+            ctx.quadraticCurveTo(x, y + size / 2, x, y + size / 4);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawStar(x, y, size, color) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, size / 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function animateBackground() {
+            ctx.clearRect(0, 0, width, height);
+
+            particles.forEach(p => {
+                p.y -= p.speedY;
+                if (p.y < -20) {
+                    p.y = height + 20;
+                    p.x = Math.random() * width;
+                }
+
+                if (p.type === 'heart') {
+                    drawHeart(p.x, p.y, p.size, `rgba(236, 72, 153, ${p.opacity})`);
+                } else {
+                    drawStar(p.x, p.y, p.size, `rgba(168, 85, 247, ${p.opacity})`);
+                }
+            });
+
+            requestAnimationFrame(animateBackground);
+        }
+        animateBackground();
+
+        // Live Counter Logic (Start Date: March 11, 2022)
+        const startDate = new Date('2022-03-11T00:00:00');
+
+        function updateCounter() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('counterDays').innerText = days;
+            document.getElementById('counterHours').innerText = hours;
+            document.getElementById('counterMinutes').innerText = minutes;
+            document.getElementById('counterSeconds').innerText = seconds;
+        }
+        setInterval(updateCounter, 1000);
+        updateCounter();
+
+        // Envelope Open Logic
+        const envelopeContainer = document.getElementById('envelopeContainer');
+        const envelopeClosedState = document.getElementById('envelopeClosedState');
+        const letterContent = document.getElementById('letterContent');
+        const closeLetterBtn = document.getElementById('closeLetterBtn');
+
+        envelopeContainer.addEventListener('click', function (e) {
+            if (letterContent.classList.contains('hidden')) {
+                sfx.playPop();
+                envelopeClosedState.classList.add('hidden');
+                letterContent.classList.remove('hidden');
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }
+        });
+
+        closeLetterBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            sfx.playPop();
+            letterContent.classList.add('hidden');
+            envelopeClosedState.classList.remove('hidden');
+        });
+
+        // Coupon Redemption Function
+        function redeemCoupon(title) {
+            sfx.playFanfare();
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            // Create notification badge
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 z-50 bg-gradient-to-r from-pink-600 to-purple-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-pink-400 transform translate-y-10 opacity-0 transition-all duration-300';
+            toast.innerHTML = `
+                <i class="fas fa-check-circle text-2xl"></i>
+                <div>
+                    <h4 class="font-bold text-sm">Coupon Redeemed!</h4>
+                    <p class="text-xs text-pink-100">${title}</p>
+                </div>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Lightbox Functions
+        function openLightbox(src, caption) {
+            sfx.playPop();
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            const lightboxCaption = document.getElementById('lightboxCaption');
+
+            lightboxImg.src = src;
+            lightboxCaption.innerText = caption;
+
+            lightbox.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeLightbox() {
+            sfx.playPop();
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        // Dodging "No" Button Interaction
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+
+        noBtn.addEventListener('mouseover', moveNoBtn);
+        noBtn.addEventListener('touchstart', moveNoBtn);
+
+        function moveNoBtn() {
+            sfx.playPop();
+            const container = document.getElementById('questionSection');
+            const rect = container.getBoundingClientRect();
+            
+            const maxX = rect.width - 120;
+            const maxY = rect.height - 60;
+
+            const newX = Math.random() * maxX - maxX/2;
+            const newY = Math.random() * maxY - maxY/2;
+
+            noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
+        }
+
+        yesBtn.addEventListener('click', () => {
+            sfx.playFanfare();
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+            alert('Yay! Date night setup confirmed with Khushi! 🍿🎮❤️');
+        });
+
+        // Card flip for touch devices
+        document.querySelectorAll('.flip-card').forEach(card => {
+            card.addEventListener('click', () => {
+                sfx.playPop();
+                card.classList.toggle('flipped');
+            });
+        });
+
+        // BGM Music Synthesizer / Toggle Placeholder
+        const bgmToggle = document.getElementById('bgmToggle');
+        const bgmStatus = document.getElementById('bgmStatus');
+        const bgmIcon = document.getElementById('bgmIcon');
+        let isPlaying = false;
+
+        bgmToggle.addEventListener('click', () => {
+            sfx.playPop();
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                bgmIcon.className = "fas fa-volume-up text-sm";
+                bgmStatus.innerText = "Music On 🎵";
+                confetti({ particleCount: 30, spread: 40 });
+            } else {
+                bgmIcon.className = "fas fa-music text-sm";
+                bgmStatus.innerText = "Love Anthem";
+            }
+        });
+    </script>
+</body>
+</html>
